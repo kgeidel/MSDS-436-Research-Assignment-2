@@ -29,16 +29,40 @@ October 27, 2024 <br>
 
 <hr>
 
+
+
 ### Experimental design
 
 <hr>
 
-(INCLUDE "TREATMENT CONDITIONS" AND DATA)
-(DESCRIBE QUERY TASKS)
+According to Quora's AI bot (Assistant 2024) a Monte Carlo performance benchmark must have a defined problem, model, reference data and established metrics. Each framework must answer ....
 
-### Installing and running the experiment
+(INCLUDE "TREATMENT CONDITIONS" AND DATA)
+
+The dataset used for the benchmark is a collection of every tic-tac-toe endstate (van Rijn 2014). There are 958 records and 10 attributes (the state of each of the nine squares plus a boolean representing if 'X', who moves first, is victorious or not.) 
+
+QUERY TASKS:
+
+
+* Nested conditionals: return all endstates in which either side is victorious using a diagonal
+* Subquery: return all endstates in which the top-left square is 'X' and the bottom-right and middle-right squares are 'O'
+* Aggregation: calculate the percentage of endstates in which 'X' is victorious.
+* Aggregation: given each square a point value based on its position (top-left is 1 and bottom-right is 9) sum each side's total "score" over all records.
+
+
+### Installing and running the benchmark
 
 <hr>
+
+```shell
+# Clone and enter the repo
+git clone git@github.com:kgeidel/MSDS-436-Research-Assignment-2.git
+cd MSDS-436-Research-Assignment-2
+
+# Obtain the dataset
+wget https://www.openml.org/data/download/50/dataset_50_tic-tac-toe.arff -P data
+```
+
 
 ### Experimental results
 
@@ -57,7 +81,11 @@ October 27, 2024 <br>
 <hr>
 
 <div style="padding-left: 1.5em; text-indent: -1.5em">
+Assistant. “How Do You Create a Benchmark for Testing Monte Carlo Simulation Against?” Quora, August 16, 2024. https://www.quora.com/How-do-you-create-a-benchmark-for-testing-Monte-Carlo-simulation-against. 
 
+<br>
+
+Rijn, Jan van. “Tic-Tac-Toe.” OpenML, April 6, 2014. https://www.openml.org/search?type=data&status=active&id=50. 
 
 
 </div>
