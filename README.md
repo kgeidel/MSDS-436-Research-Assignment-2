@@ -44,10 +44,9 @@ The dataset used for the benchmark is a collection of every tic-tac-toe endstate
 QUERY TASKS:
 
 
-* Nested conditionals: return all endstates in which either side is victorious using a diagonal
-* Subquery: return all endstates in which the top-left square is 'X' and the bottom-right and middle-right squares are 'O'
-* Aggregation: calculate the percentage of endstates in which 'X' is victorious.
-* Aggregation: given each square a point value based on its position (top-left is 1 and bottom-right is 9) sum each side's total "score" over all records.
+* Logical combinations of conditionals: return all endstates in which either side is victorious using a diagonal
+* Aggregation in queries: calculate the percentage of endstates in which 'X' is victorious.
+* Aggregation in loops: given each square a point value based on its position (top-left is 1 and bottom-right is 9) sum each side's total "score" over all records.
 
 
 ### Installing and running the benchmark
@@ -59,10 +58,25 @@ QUERY TASKS:
 git clone git@github.com:kgeidel/MSDS-436-Research-Assignment-2.git
 cd MSDS-436-Research-Assignment-2
 
-# Obtain the dataset
-wget https://www.openml.org/data/download/50/dataset_50_tic-tac-toe.arff -P data
+
+
 ```
 
+### Troubleshooting
+
+<hr>
+
+If you are unable to install and run the benchmark experiment there are a few things you can try.
+
+```shell
+# The repo contains a copy of the dataset but if, for some reason, it cannot be found you can obtain it from the web (run this command from the project repo root!)
+wget https://www.openml.org/data/download/50/dataset_50_tic-tac-toe.arff -P data
+
+# The repo contains the SQLite file (mc_benchmark/db.sqlite3) if there is an issue with this file you can create a fresh one using setup.ipynb
+# if you have jupyter installed you can try:
+jupyter nbconvert --execute setup.ipynb
+# Alternatively, you can open the notebook and run all cells!
+```
 
 ### Experimental results
 
