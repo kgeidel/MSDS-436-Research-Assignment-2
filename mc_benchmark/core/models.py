@@ -43,11 +43,11 @@ class BenchmarkTrial:
         # args for which X wins on the main diagonal
         x_main = Q(top_left='X', middle_middle='X', bottom_right='X')
         # args for which X wins on the anti diagonal
-        x_anti = Q(bottom_right='X', middle_middle='X', top_right='X')
+        x_anti = Q(bottom_left='X', middle_middle='X', top_right='X')
         # args for which O wins on the main diagonal
         o_main = Q(top_left='O', middle_middle='O', bottom_right='O')
         # args for which O wins on the anti diagonal
-        o_anti = Q(bottom_right='O', middle_middle='O', top_right='O')    
+        o_anti = Q(bottom_left='O', middle_middle='O', top_right='O')    
         return EndState.objects.filter(
             x_main | x_anti | o_main | o_anti
         )

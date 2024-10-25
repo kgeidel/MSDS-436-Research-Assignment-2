@@ -29,25 +29,31 @@ October 27, 2024 <br>
 
 <hr>
 
-
+* **assets** contains images generated to share results
+* **data** contains the raw arff data file from openml.org
+* **go_benchmark** contains source code (and results.csv) for the Go benchmark
+* **mc_benchmark** contains the Django project for the Python benchmark
+    * **core** is the main app of the Django project. Contains `models.py` that define the classes used to manage the database and conduct the Python experiment.
+    * *db.sqlite3* is our database file
+    * *django_benchmark.ipynb* is a Jupyter notebook that runs the Django experiment and generates pyplot figures comparing both Python and Go results.
+    * *setup.ipynb* is a Jupyter notebook that will extract the tic-tac-toe data from the arff and load it into SQLite.
+* *README.md* is this paper.
+* *requirements.txt* is a list of required python packages needed for the Django experiment. (Install using *pip*.)
 
 ### Experimental design
 
 <hr>
 
-According to Quora's AI bot (Assistant 2024) a Monte Carlo performance benchmark must have a defined problem, model, reference data and established metrics. Each framework must answer ....
+According to Quora's AI bot (Assistant 2024) a Monte Carlo performance benchmark must have a defined problem, model, reference data and established metrics. Each framework must complete three query tasks and generate the same output (i.e. same requirements on output.)
 
-(INCLUDE "TREATMENT CONDITIONS" AND DATA)
 
 The dataset used for the benchmark is a collection of every tic-tac-toe end state (van Rijn 2014). There are 958 records and 10 attributes (the state of each of the nine squares plus a boolean representing if 'X', who moves first, is victorious or not.) 
 
 QUERY TASKS:
 
-
-* Logical combinations of conditionals: return all end states in which either side is victorious using a diagonal
-* Aggregation in queries: calculate the percentage of end states in which 'X' is victorious.
-* Aggregation in loops: given each square a point value based on its position (top-left is 1 and bottom-right is 9) sum each side's total "score" over all records.
-
+* Logical combinations of conditionals: return all end states in which either side is victorious using a diagonal. 
+* Aggregation in queries: calculate the percentage of end states in which 'X' is victorious. Return the value as a string (including the percent sign.)
+* Aggregation in loops: given each square a point value based on its position (top-left is 1 and bottom-right is 9) sum each side's total "score" over all records. Return the value as a dict/struct with 'X' as the first key and 'O' as the second.
 
 ### Installing and running the benchmark
 
@@ -58,8 +64,25 @@ QUERY TASKS:
 git clone git@github.com:kgeidel/MSDS-436-Research-Assignment-2.git
 cd MSDS-436-Research-Assignment-2
 
+# Run the Go benchmark
+cd go_benchmark
+# Enable CGo 
+export CGO_ENABLED=1
+# Ensure the results file is ready
+touch results.csv && chmod 664 results.csv
+# Execute the experiemnt
+go run .
 
+# (You should see entries in results.csv!)
 
+# Leave the Go dir and enter the Django dir
+cd ../mc_benchmark
+
+# Install required dependencies using pip
+pip install -r requirements.txt
+
+# Open django_benchmark.ipynb and run the cells to execute the django experiment
+# and see the results compared.
 ```
 
 ### Troubleshooting
@@ -82,13 +105,18 @@ jupyter nbconvert --execute setup.ipynb
 
 <hr>
 
+* [Figure 1: Benchmark trial distributions for both frameworks](#figure-1-benchmark-trial-distributions-of-both-frameworks)
 * [Table 1: Django benchmark results](#table-1-django-benchmark-results-n100)
-* [Figure 1: Django benchmark trial distributions](#figure-1-django-benchmark-trial-distributions)
-* [Table 3: Summary of results](#table-3-summary-of-results)
+* [Table 2: Gin/Go benchmark results](#table-2-gin-benchmark-results-n100)
+* [Table 3: Summary of results and comparison](#table-3-summary-of-results)
 
-The Django framework is the first tested. The Jupyter notebook found at `mc_benchmark/django_benchmark.ipynb` can be executed to run the experiment and display results. Each time you run the experiment there is, obviously, variation in the exact numbers. Here is, however, data from one such experiment.
+#### Figure 1: Benchmark trial distributions of both frameworks
+
+![figure1](assets/figure_1.png)
 
 #### Table 1: Django benchmark results (n=100)
+
+The Django framework is the first tested. The Jupyter notebook found at `mc_benchmark/django_benchmark.ipynb` can be executed to run the experiment and display results. Each time you run the experiment there is, obviously, variation in the exact numbers. Here is, however, data from one such experiment.
 
 |     |   task_1_duration |   task_1_results |   task_2_duration | task_2_results   |   task_3_duration | task_3_results           |   total_microseconds |
 |----:|------------------:|-----------------:|------------------:|:-----------------|------------------:|:-------------------------|---------------------:|
@@ -193,11 +221,111 @@ The Django framework is the first tested. The Jupyter notebook found at `mc_benc
 |  99 |               492 |    8765559648525 |               892 | 65.34%           |             10858 | {'X': 18210, 'O': 15000} |                12242 |
 | 100 |               498 |    8765559648645 |              1006 | 65.34%           |             10522 | {'X': 18210, 'O': 15000} |                12026 |
 
-#### Figure 1: Django benchmark trial distributions
-
-![figure1](assets/figure_1.png)
-
 #### Table 2: Gin benchmark results (n=100)
+
+| Task 1 | Task 2 | Task 3 | Total microseconds |
+| -----: | -----: | -----: | -----------------: |
+| 4800 | 4598 | 5199 | 14597 |
+| 4607 | 4074 | 4939 | 13620 |
+| 4386 | 4064 | 4741 | 13191 |
+| 5650 | 4060 | 4700 | 14410 |
+| 4225 | 4010 | 4664 | 12899 |
+| 5226 | 4196 | 4509 | 13931 |
+| 4430 | 4405 | 7385 | 16220 |
+| 4245 | 4191 | 5631 | 14067 |
+| 4249 | 4029 | 4650 | 12928 |
+| 4245 | 4125 | 4473 | 12843 |
+| 4039 | 4001 | 4540 | 12580 |
+| 4313 | 4004 | 4691 | 13008 |
+| 4258 | 4052 | 4748 | 13058 |
+| 4109 | 4124 | 4814 | 13047 |
+| 4228 | 3922 | 4796 | 12946 |
+| 4047 | 3896 | 4735 | 12678 |
+| 4091 | 4089 | 4726 | 12906 |
+| 4506 | 4286 | 5029 | 13821 |
+| 4399 | 4368 | 4728 | 13495 |
+| 4438 | 4259 | 4636 | 13333 |
+| 4261 | 4201 | 4640 | 13102 |
+| 4278 | 4315 | 4889 | 13482 |
+| 4755 | 4373 | 4796 | 13924 |
+| 7672 | 4582 | 4872 | 17126 |
+| 4336 | 4260 | 4517 | 13113 |
+| 4966 | 3914 | 4549 | 13429 |
+| 4197 | 3949 | 4663 | 12809 |
+| 4355 | 4044 | 4661 | 13060 |
+| 4177 | 4089 | 4623 | 12889 |
+| 4220 | 4152 | 4702 | 13074 |
+| 4230 | 4093 | 4443 | 12766 |
+| 4152 | 4067 | 4434 | 12653 |
+| 4292 | 4138 | 4693 | 13123 |
+| 4142 | 4078 | 4476 | 12696 |
+| 4115 | 4125 | 4647 | 12887 |
+| 4208 | 4158 | 4989 | 13355 |
+| 4848 | 4702 | 5058 | 14608 |
+| 4568 | 4459 | 4829 | 13856 |
+| 4604 | 4460 | 4872 | 13936 |
+| 4585 | 4499 | 5110 | 14194 |
+| 4718 | 4498 | 5409 | 14625 |
+| 4755 | 5338 | 5056 | 15149 |
+| 4098 | 3975 | 4609 | 12682 |
+| 4948 | 4088 | 4958 | 13994 |
+| 3880 | 5530 | 4851 | 14261 |
+| 4258 | 3994 | 4686 | 12938 |
+| 4110 | 4176 | 4648 | 12934 |
+| 4179 | 4069 | 4633 | 12881 |
+| 4392 | 3988 | 5051 | 13431 |
+| 4158 | 3973 | 4568 | 12699 |
+| 4263 | 4128 | 4642 | 13033 |
+| 4226 | 4199 | 4814 | 13239 |
+| 4481 | 4071 | 4765 | 13317 |
+| 4151 | 4109 | 4669 | 12929 |
+| 4246 | 4068 | 4632 | 12946 |
+| 4409 | 4244 | 4871 | 13524 |
+| 4276 | 4134 | 4726 | 13136 |
+| 4138 | 4105 | 4575 | 12818 |
+| 4339 | 4251 | 4844 | 13434 |
+| 4215 | 4358 | 6364 | 14937 |
+| 4058 | 4044 | 4658 | 12760 |
+| 4295 | 3993 | 4645 | 12933 |
+| 4078 | 4293 | 4834 | 13205 |
+| 4221 | 3897 | 4576 | 12694 |
+| 4442 | 4046 | 4745 | 13233 |
+| 4109 | 3954 | 4854 | 12917 |
+| 4242 | 3950 | 4745 | 12937 |
+| 3836 | 3867 | 4642 | 12345 |
+| 4197 | 4238 | 4819 | 13254 |
+| 4062 | 3974 | 4607 | 12643 |
+| 4206 | 4219 | 4807 | 13232 |
+| 4099 | 4037 | 4809 | 12945 |
+| 4327 | 4035 | 4671 | 13033 |
+| 4707 | 4007 | 5062 | 13776 |
+| 7015 | 4848 | 4512 | 16375 |
+| 4093 | 4242 | 4488 | 12823 |
+| 4143 | 4137 | 5841 | 14121 |
+| 4358 | 4069 | 4727 | 13154 |
+| 4061 | 3995 | 4526 | 12582 |
+| 4501 | 4092 | 4701 | 13294 |
+| 4383 | 4236 | 4584 | 13203 |
+| 4304 | 4116 | 4474 | 12894 |
+| 4179 | 4261 | 4788 | 13228 |
+| 4378 | 4072 | 4614 | 13064 |
+| 4277 | 3938 | 5035 | 13250 |
+| 4198 | 3836 | 6063 | 14097 |
+| 4228 | 4191 | 4427 | 12846 |
+| 4177 | 3991 | 4706 | 12874 |
+| 4208 | 4022 | 4737 | 12967 |
+| 4117 | 3969 | 4431 | 12517 |
+| 4201 | 4011 | 4432 | 12644 |
+| 4258 | 4022 | 4608 | 12888 |
+| 4681 | 4067 | 4534 | 13282 |
+| 4022 | 3926 | 4923 | 12871 |
+| 5554 | 3953 | 4251 | 13758 |
+| 4018 | 3849 | 4600 | 12467 |
+| 4177 | 4190 | 4695 | 13062 |
+| 4088 | 4201 | 4619 | 12908 |
+| 4047 | 4103 | 4464 | 12614 |
+| 4141 | 4455 | 4537 | 13133 |
+
 
 #### Table 3: Summary of results
 
@@ -205,41 +333,53 @@ The two frameworks are compared in the summary below. These are statistical desc
 
 | Task |       | Django (Python) | Gin (Go) |
 | ---: | ----: | --------------: | -------: |
-|      | count | 100             |          |
-|  1   | avg | 590.41     |          |
-|      | std | 153.43     |          |
-|      | min | 438.00     |          |
-|      | 25% | 484.75     |          |
-|      | 50% | 544.00     |          |
-|      | 75% | 651.00     |          |
-|      | max | 1172.00    |          |
-| 2    | avg | 930.36     |          |
-|      | std | 304.49     |          |
-|      | min | 667.00     |          |
-|      | 25% | 748.75     |          |
-|      | 50% | 849.00     |          |
-|      | 75% | 991.00     |          |
-|      | max | 3143.00    |          |
-| 3    | avg | 10857.77   |          |
-|      | std | 3886.12    |          |
-|      | min | 8722.00    |          |
-|      | 25% | 9483.25    |          |
-|      | 50% | 9976.00    |          |
-|      | 75% | 10879.50   |          |
-|      | max | 45562.00   |          |
-| total | avg  | 12378.54 |          |
-|      | std  | 3952.32   |          |
-|      | min  | 9933.00   |          |
-|      | 25%  | 10848.25  |          |
-|      | 50%  | 11555.50  |          |
-|      | 75%  | 12326.00  |          |
-|      | max  | 46900.00  |          |
+|      | count | 100             |    100      |
+|  1   | avg | 590.41     |  543.36        |
+|      | std | 153.43     |  141.31        |
+|      | min | 438.00     |  435.00        |
+|      | 25% | 484.75     |  468.00        |
+|      | 50% | 544.00     |  498.50        |
+|      | 75% | 651.00     |  563.25        |
+|      | max | 1172.00    |  1331.00        |
+| 2    | avg | 930.36     |  867.46        |
+|      | std | 304.49     |  278.60        |
+|      | min | 667.00     |  679.00        |
+|      | 25% | 748.75     |  735.00        |
+|      | 50% | 849.00     |  788.00        |
+|      | 75% | 991.00     |  883.25        |
+|      | max | 3143.00    |  3064.00        |
+| 3    | avg | 10857.77   |  10225.43        |
+|      | std | 3886.12    |  3872.11        |
+|      | min | 8722.00    |  8873.00        |
+|      | 25% | 9483.25    |  9292.00        |
+|      | 50% | 9976.00    |  9712.00        |
+|      | 75% | 10879.50   |  10181.75        |
+|      | max | 45562.00   |  47205.00        |
+| total | avg  | 12378.54 |  11636.25        |
+|      | std  | 3952.32   |  3869.69        |
+|      | min  | 9933.00   |  10015.00        |
+|      | 25%  | 10848.25  |  10598.25        |
+|      | 50%  | 11555.50  |  11134.50        |
+|      | 75%  | 12326.00  |  11551.75        |
+|      | max  | 46900.00  |  48471.00        |
 
 ### Conclusions
 
 <hr>
 
-(RECOMMENDATIONS FOR MANAGEMENT- WHICH FRAMEWORK TO USE?)
+I was very surprised to see how closely the two frameworks performed. However, in all three query tasks Go was faster. The edge, on average, ranged from 47 microseconds for task 1 to 632 microseconds for task 3 (Go finished the complete 100 trial experiment, on average, 741.85 microseconds faster than Django.) Go also had smaller variance in it's performance in all three tasks by small margins (for example, the standard deviation for Django's total time was 3,952.32 versus Go's 3,869.69)
+
+Implementation was quite different. This may be limited by my experience with Go (there may be better ways to code the query tasks) however Python is known for its ability to elegantly and densely write complex logic in abstract (and therefore reusable) ways. Assuming my implementation was not severely sub-optimal (in either framework but particularly in Go's) we can see the differences between languages exemplified in query task 3 (see figures 2 and 3).
+
+As for the recommendation to the company, I would refer to the project objectives, constraints, priorities and risks. If we truly desire optimized performance then this benchmark finds Go the superior framework (although by small margins at this complexity of task and sample size.) If maximizing processing throughput is second to maintainability, rapidity of deployment, flexibility in scope/features or scalability then this developer finds the performance differences are not vast enough to rule out Python and that Django should be the framework of choice.
+
+#### Figure 2: Query task 3 in Python
+
+![query 3 in Python](assets/figure_2_python.png)
+
+#### Figure 3: Query task 3 in Go
+
+![query 3 in Python](assets/figure_3_go.png)
 
 ### References
 
@@ -248,7 +388,9 @@ The two frameworks are compared in the summary below. These are statistical desc
 <div style="padding-left: 1.5em; text-indent: -1.5em">
 Assistant. “How Do You Create a Benchmark for Testing Monte Carlo Simulation Against?” Quora, August 16, 2024. https://www.quora.com/How-do-you-create-a-benchmark-for-testing-Monte-Carlo-simulation-against. 
 
+
 <br>
+
 
 Rijn, Jan van. “Tic-Tac-Toe.” OpenML, April 6, 2014. https://www.openml.org/search?type=data&status=active&id=50. 
 
